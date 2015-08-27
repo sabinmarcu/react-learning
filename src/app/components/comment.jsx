@@ -11,17 +11,35 @@ export default class Comment extends React.Component {
     };
 
     get parsedComment() {
-        return {__html: Marked(this.props.children || (this.context.comment ? this.context.comment.comment : "") || this.props.comment || "")};
+        return {__html: Marked(this.comment)};
+    }
+
+    get author() {
+        return this.props.author || (this.context.comment ? this.context.comment.author : "") || ""
+    }
+
+    get comment() {
+        return this.props.children || (this.context.comment ? this.context.comment.comment : "") || this.props.comment || "";
+    }
+
+    get listItem() {
+        if (this.author.length > 0) {
+            return <ListItem
+                primaryText={this.author}
+                secondaryText={(<span dangerouslySetInnerHTML={this.parsedComment}></span>)}
+                leftIcon={<Avatar>{this.author[0].toUpperCase()}</Avatar>}
+            />;
+        }
+        return <ListItem
+            primaryText={this.author}
+            secondaryText={(<span dangerouslySetInnerHTML={this.parsedComment}></span>)}
+        />;
     }
 
     render() {
         return (
             <span>
-                <ListItem
-                    primaryText={this.props.author || (this.context.comment ? this.context.comment.author : "") || ""}
-                    secondaryText={(<span dangerouslySetInnerHTML={this.parsedComment}></span>)}
-                    leftIcon={<Avatar>{(this.props.author || (this.context.comment ? this.context.comment.author : "") || "")[0].toUpperCase()}</Avatar>}
-                />
+                {this.listItem}
             </span>
         );
     }

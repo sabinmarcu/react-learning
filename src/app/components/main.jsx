@@ -50,13 +50,18 @@ export default class Main extends React.Component {
         this.setState({data: this.state.data.concat([{name: author, text: content}])});
     }
 
+    @selfbind
+    reset() {
+        this.setState({data: []});
+    }
+
     render() {
         return (
             <div className="commentSection">
                 <AppBar
                     title="Comments Section"
-                    iconElementLeft={<IconButton><FontIcon className="mdi mdi-refresh" color={Colors.white500} /></IconButton>}
-                    iconElementRight={<IconButton><FontIcon className="mdi mdi-close" color={Colors.white500} /></IconButton>}
+                    iconElementLeft={<IconButton onClick={this.loadData}><FontIcon className="mdi mdi-refresh" color={Colors.white500} /></IconButton>}
+                    iconElementRight={<IconButton onClick={this.reset}><FontIcon className="mdi mdi-close" color={Colors.white500} /></IconButton>}
                 />
                 <List data={this.state.data} />
                 <Form submitHandle={this.addComment}/>
