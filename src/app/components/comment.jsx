@@ -27,12 +27,14 @@ export default class Comment extends React.Component {
             return <ListItem
                 primaryText={this.author}
                 secondaryText={(<span dangerouslySetInnerHTML={this.parsedComment}></span>)}
-                leftIcon={<Avatar>{this.author[0].toUpperCase()}</Avatar>}
+                leftIcon={<Avatar style={{lineHeight: "24px"}}>{this.author[0].toUpperCase()}</Avatar>}
+                style={{paddingLeft: "10px", overflow: "auto"}}
             />;
         }
         return <ListItem
             primaryText={this.author}
-            secondaryText={(<span dangerouslySetInnerHTML={this.parsedComment}></span>)}
+            secondaryText={(<span dangerouslySetInnerHTML={this.parsedComment}
+                style={{paddingLeft: "10px", overflow: "auto"}}></span>)}
         />;
     }
 
