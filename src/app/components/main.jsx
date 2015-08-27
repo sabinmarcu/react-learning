@@ -56,6 +56,7 @@ export default class Main extends React.Component {
     }
 
     render() {
+        let crstyle = {color: "#ddd", textDecoration: "none", marginTop: "10px", position: "relative"};
         return (
             <div className="commentSection">
                 <AppBar
@@ -65,6 +66,30 @@ export default class Main extends React.Component {
                 />
                 <List data={this.state.data} />
                 <Form submitHandle={this.addComment}/>
+                <div className="footer"><span id="links">
+                    <a href="https://facebook.com/sabinmarcu">
+                        <FontIcon className="mdi mdi-18px mdi-facebook" color={Colors.white500} style={{color: "#ccc", fontSize: "14pt !important", margin: "0 2px 0 0"}} />
+                    </a>
+                    <a href="https://twitter.com/sabinmarcu">
+                        <FontIcon className="mdi mdi-18px mdi-twitter" color={Colors.white500} style={{color: "#ccc", fontSize: "14pt !important", margin: "0 2px 0 0"}} />
+                    </a>
+                    <a href="https://github.com/sabinmarcu">
+                        <FontIcon className="mdi mdi-18px mdi-github-circle" color={Colors.white500} style={{color: "#ccc", fontSize: "14pt !important", margin: "0 2px 0 0"}} />
+                    </a>
+                    <a href="https://linkedin.com/in/sabinmarcu">
+                        <FontIcon className="mdi mdi-18px mdi-linkedin" color={Colors.white500} style={{color: "#ccc", fontSize: "14pt !important", margin: "0 2px 0 0"}} />
+                    </a>
+                </span>
+                    Copyright Sabin Marcu 2015
+                    <a href="https://sabinmarcu.github.com/" id="ownsite">
+                        <FontIcon className="mdi mdi-18px mdi-link" color={Colors.white500} style={{color: "#ccc", fontSize: "14pt !important", margin: "0 2px 0 0"}} />
+                    </a>
+
+                    <a id="thisrepo" href="https://github.com/sabinmarcu/react-learning" style={{color: "#ddd", textDecoration: "none"}}>
+                        <span>This Repo</span>
+                        <FontIcon className="mdi mdi-18px mdi-github-box" color={Colors.white500} style={{color: "#ccc", fontSize: "14pt !important", margin: "0 2px 0 0"}} />
+                    </a>
+                </div>
             </div>
         );
     }
