@@ -1,5 +1,5 @@
 [
-    {"name": "Sabin Marcu", "text": "Some weird Text"},
-    {"name": "Gagean Diana", "text": "Some *really* **weird** text"},
-    {"name": "Irina Iarca", "text": "> Wtf is going on?"}
+    {"name": "Nobody", "text": "Some weird Text"},
+    {"name": "First Person", "text": "Some *really* **weird** text"},
+    {"name": "Second Person", "text": "> Wtf is going on?"}
 ]
