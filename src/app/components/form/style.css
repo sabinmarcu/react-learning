@@ -1,0 +1,10 @@
+:local .fullDesign {
+    display: flex;
+    align-items: stretch;
+}
+
+:local .fullDesign .pane {
+    flex: 1 1 auto;
+    max-width: 50%;
+    min-width: 50%;
+}

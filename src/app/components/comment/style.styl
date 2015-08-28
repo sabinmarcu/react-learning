@@ -1,0 +1,14 @@
+:local .listItem
+    padding 0 10px
+
+.bordered :local(.listItem), :local(.listItem).bordered
+    &:after
+        content ""
+        margin 0 10px
+        display block
+        clear both
+        border-top solid 1px #eee
+
+:local .avatar
+    line-height 24px !important
+    opacity 0.6
