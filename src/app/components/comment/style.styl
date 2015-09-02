@@ -1,5 +1,20 @@
+@import "../../../../node_modules/nib/lib/nib/index.styl"
+@import "../_variables.styl"
+
 :local .listItem
     padding 0 10px
+    background white
+    .avatar
+        line-height 24px !important
+        opacity 1
+        transition all 1s mdtiming
+
+:local .wrapper
+    transition all 2s mdtiming
+    overflow hidden
+    display block
+    opacity 0
+    height 0
 
 .bordered :local(.listItem), :local(.listItem).bordered
     &:after
@@ -8,7 +23,4 @@
         display block
         clear both
         border-top solid 1px #eee
-
-:local .avatar
-    line-height 24px !important
-    opacity 0.6
+        transition all 1s mdtiming

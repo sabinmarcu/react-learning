@@ -5,18 +5,28 @@
     let injectTapEventPlugin = require('react-tap-event-plugin');
     let Main = require('./components/main.jsx'); // Our custom react component
     let jQuery = require("jquery");
+    let {renderDevTools, createStore} = require("./helpers/devTools");
+    let redux = require("redux");
+    let initialCreateStore = redux.createStore;
+    let _ = require("underscore");
 
-    //Needed for React Developer Tools
+    let { combineReducers } = require('redux');
+    let { Provider } = require('react-redux');
+
     window.React = React;
-
-    //Needed for onTouchTap
-    //Can go away when react 1.0 release
-    //Check this repo:
-    //https://github.com/zilverline/react-tap-event-plugin
     injectTapEventPlugin();
 
-    // Render the main app react component into the document body.
-    // For more details see: https://facebook.github.io/react/docs/top-level-api.html#react.render
-    React.render(<Main url="comments.json" pollInterval={2000} />, document.body);
+    let reducers = require("./helpers/util").requireAll(require.context('./reducers/', true, /\.reducer\.(js|ls|jsx)$/));
+    const reducer = combineReducers( [(state, action) => reducers.reduce((p,r) => r(p, action), state)] || []);
+    const store = createStore(reducer);
+
+    React.render(
+        (<div>
+            <Provider store={store}>
+                {() => <Main url="comments.json" pollInterval={2000} />}
+            </Provider>
+            {renderDevTools(store)}
+        </div>)
+    , document.body);
 
 })();

@@ -1,5 +1,5 @@
 [
-    {"name": "Sabin Marcu", "text": "Some weird Text"},
-    {"name": "Gagean Diana", "text": "Some *really* **weird** text"},
-    {"name": "Irina Iarca", "text": "> Wtf is going on?"}
+    {"author": "Sabin Marcu", "comment": "Some weird Text"},
+    {"author": "Gagean Diana", "comment": "Some *really* **weird** text"},
+    {"author": "Irina Iarca", "comment": "> Wtf is going on?"}
 ]

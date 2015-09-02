@@ -6,6 +6,9 @@ const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
 const ARGUMENT_NAMES = /([^\s,]+)/g;
 class Aux {
 
+    static requireAll(r) {
+        return r.keys().map(r);
+    }
     static reflection(func) {
         let fnStr = func.toString().replace(STRIP_COMMENTS, "");
         let result = fnStr.slice(fnStr.indexOf("(") + 1, fnStr.indexOf(")")).match(ARGUMENT_NAMES);
@@ -19,10 +22,10 @@ class Aux {
             return dest;
         }
         for (let i = 1; i < l; i++) {
-            let hasDescriptor = false, bindMode, owner, shouldBind = true;
+            let hasDescriptor = false, bindMode, owner, shouldBind = true, useSelfbind = false;
             let o = arguments[i];
             if ((typeof o.isBindingDescriptor) !== "undefined" && (typeof o.object) !== "undefined") {
-                hasDescriptor = true; bindMode = o.bind_mode || false; owner = o.owner || null; shouldBind = o.bind !== undefined ? o.bind : shouldBind; o = o.object;
+                hasDescriptor = true; bindMode = o.bind_mode || false; owner = o.owner || null; shouldBind = o.bind !== undefined ? o.bind : shouldBind; useSelfbind = o.useSelfbind || o.selfbind || useSelfbind; o = o.object;
             }
             let keys = Object.getOwnPropertyNames(o);
             for (let k of keys) {
@@ -36,16 +39,50 @@ class Aux {
                                 else {
                                     if (bindMode === "descriptor") {
                                         try {
-                                            let descriptor = Object.getOwnPropertyDescriptor(o, k);
+                                            let descriptor = Object.getOwnPropertyDescriptor(o, k), sbdescriptor, val = null, get = null, set = null;
                                             if (descriptor.value != null && (typeof descriptor.value.apply) !== "undefined") {
-                                                descriptor.value = descriptor.value.bind(owner);
+                                                if (useSelfbind) {
+                                                    val = descriptor.value;
+                                                    delete descriptor.value;
+                                                } else {
+                                                    descriptor.value = descriptor.value.bind(owner);
+                                                }
                                             }
                                             if ((typeof descriptor.get) !== "undefined") {
-                                                descriptor.get = descriptor.get.bind(owner);
+                                                if (useSelfbind) {
+                                                    get = descriptor.get;
+                                                    delete descriptor.get;
+                                                } else {
+                                                    descriptor.get = descriptor.get.bind(owner);
+                                                }
                                             }
 
                                             if ((typeof descriptor.set) !== "undefined") {
-                                                descriptor.set = descriptor.set.bind(owner);
+                                                if (useSelfbind) {
+                                                    set = descriptor.set;
+                                                    delete descriptor.set;
+                                                } else {
+                                                    descriptor.set = descriptor.set.bind(owner);
+                                                }
+                                            }
+                                            if (useSelfbind) {
+                                                delete descriptor.writable;
+                                                descriptor.get = function() {
+                                                    let obj = {configurable: true, writable: true};
+                                                    if (val !== null) {
+                                                        const bound = val.bind(owner);
+                                                        obj.value = bound;
+                                                    }
+                                                    if (get !== null) {
+                                                        const bound = get.bind(owner);
+                                                        obj.get = bound;
+                                                    }
+                                                    if (set !== null) {
+                                                        const bound = set.bind(owner);
+                                                        obj.set = bound;
+                                                    }
+                                                    Object.defineProperty(dest, k, obj);
+                                                }
                                             }
                                             Object.defineProperty(dest, k, descriptor);
                                         } catch (e) {
@@ -57,16 +94,50 @@ class Aux {
                             }
                             else {
                                 if (bindMode === "descriptor") {
-                                    let descriptor = Object.getOwnPropertyDescriptor(o, k);
+                                    let descriptor = Object.getOwnPropertyDescriptor(o, k), val = null, get = null, set = null;
                                     if (descriptor.value != null && (typeof descriptor.value.apply) !== "undefined") {
-                                        descriptor.value = descriptor.value;
+                                        if (useSelfbind) {
+                                            val = descriptor.value;
+                                            delete descriptor.value;
+                                        } else {
+                                            descriptor.value = descriptor.value;
+                                        }
                                     }
                                     if ((typeof descriptor.get) !== "undefined") {
-                                        descriptor.get = descriptor.get;
+                                        if (useSelfbind) {
+                                            get = descriptor.get;
+                                            delete descriptor.get;
+                                        } else {
+                                            descriptor.get = descriptor.get;
+                                        }
                                     }
 
                                     if ((typeof descriptor.set) !== "undefined") {
-                                        descriptor.set = descriptor.set;
+                                        if (useSelfbind) {
+                                            set = descriptor.set;
+                                            delete descriptor.set;
+                                        } else {
+                                            descriptor.set = descriptor.set;
+                                        }
+                                    }
+                                    if (useSelfbind) {
+                                        delete descriptor.writable;
+                                        descriptor.get = function() {
+                                            let obj = {configurable: true, writable: true};
+                                            if (val !== null) {
+                                                const bound = val.bind(this);
+                                                obj.value = bound;
+                                            }
+                                            if (get !== null) {
+                                                const bound = get.bind(this);
+                                                obj.get = bound;
+                                            }
+                                            if (set !== null) {
+                                                const bound = set.bind(this);
+                                                obj.set = bound;
+                                            }
+                                            Object.defineProperty(this, k, obj);
+                                        }
                                     }
                                     Object.defineProperty(dest, k, descriptor);
                                 } else {

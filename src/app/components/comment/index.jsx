@@ -5,9 +5,15 @@ import {ListItem, Avatar} from "material-ui";
 import is from "check-types";
 
 import styles from "./style";
-
+import $ from "jQuery";
 
 export default class Comment extends React.Component {
+
+    state = {
+        mounted: false,
+        styles: {},
+        height: 0,
+    }
 
     static contextTypes = {
         comment: React.PropTypes.object,
@@ -72,12 +78,94 @@ export default class Comment extends React.Component {
         />);
     }
 
+    get wrapperStyles() {
+        if (this.state.mounted) {
+            let node = React.findDOMNode(this);
+            let styles = window.getComputedStyle(node, null);
+            node.style.height = 'auto';
+            node.style.height = node.offsetHeight + "px";
+            return {
+                height: node.offsetHeight + "px",
+                opacity: 1,
+                display: "block",
+            };
+        } else {
+            return {
+                height: 0,
+                opacity: 0,
+                display: "block",
+            };
+        }
+    }
+
+    mount() {
+        let node = React.findDOMNode(this); node.style.height = "auto";
+        let styles = window.getComputedStyle(node, null);
+        this.setState({
+            styles: {
+                height: 0,
+                opacity: 0,
+                display: "block",
+            }, height: styles.height,
+        });
+        setTimeout(() => {
+            this.setState({
+                styles: {
+                    height: this.state.height,
+                    opacity: 1,
+                    display: "block",
+                },
+            });
+            setTimeout(() => this.setState({
+                styles: {
+                    height: "auto",
+                    opacity: 1,
+                    display: "block",
+                },
+            }), 1000);
+        }, 100);
+    }
+
+    unmount() {
+        let node = React.findDOMNode(this); node.style.height = "auto";
+        let styles = window.getComputedStyle(node, null);
+        this.setState({
+            styles: {
+                height: styles.height,
+                opacity: 0,
+                display: "block",
+            },
+        });
+        setTimeout(() => this.setState({
+            styles: {
+                height: "0px",
+                opacity: 0,
+                display: "block",
+            },
+        }), 100);
+    }
+    componentDidMount() {
+        this.mount();
+    }
+    // componentWillReceiveProps() {
+    //     this.mount();
+    // }
+
+    componentDidUnmount() {
+        this.unmount();
+    }
+
+    componentWillLeave(callback) {
+        this.unmount();
+        setTimeout(callback, 1000);
+    }
+
     render() {
-        return (
-            <span>
+        return <span
+            style={this.state.styles}
+            className={styles.wrapper}>
                 {this.listItem}
-            </span>
-        );
+            </span>;
     }
 
 }

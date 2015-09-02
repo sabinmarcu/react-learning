@@ -13,11 +13,26 @@ let Colors = mui.Styles.Colors
 
 import materialdesignicons from "mdi/css/materialdesignicons.css";
 
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
+const ctx = require.context('../actions/', true, /\.(js|ls|jsx)$/);
+const actions = ctx.keys().reduce(
+    (prev, key) => (prev[key.replace(/.*\/([^\.]*)\.(js|ls|jsx)$/, "$1")] = ctx(key)) && prev
+, {});
+
+@connect(state => {
+    return {
+        comms: state[0].comments,
+        commsMap: state[0].commentsById,
+    }
+})
 export default class Main extends React.Component {
 
-    state = {
-        data: [],
-    };
+    static propTypes = {
+        comms: React.PropTypes.array.isRequired,
+        commsMap: React.PropTypes.object.isRequired,
+        dispatch: React.PropTypes.func.isRequired,
+    }
 
     static childContextTypes = {
         muiTheme: React.PropTypes.object,
@@ -31,13 +46,32 @@ export default class Main extends React.Component {
 
     @selfbind
     loadData() {
+        const {dispatch} = this.props, db = require("../helpers/db");
+        db.get("state").then((state) => {
+            let {comments: comms, commentsById: map} = state.state;
+            dispatch(actions.resetComments());
+            comms.map(
+                (comm) => dispatch(
+                    actions.addComment(
+                        map[comm].author,
+                        map[comm].comment
+                    )
+                )
+            );
+            this.loadRemote();
+        }, this.loadRemote);
+    }
+
+    @selfbind
+    loadRemote() {
+        const {dispatch} = this.props;
         $.ajax({
             url: this.props.url,
             dataType: 'json',
             cache: false,
-            success: (data) => this.setState({data: data}),
+            success: (data) => data.map((it) => dispatch(actions.addComment(it.author, it.comment))),
             error: (xhr, status, err) => console.error(this.props.url, status, err.toString()),
-        });
+        })
     }
 
     componentDidMount() {
@@ -45,27 +79,20 @@ export default class Main extends React.Component {
         // setInterval(this.loadData, this.props.pollInterval || 5000);
     }
 
-    @selfbind
-    addComment(author, content) {
-        this.setState({data: this.state.data.concat([{name: author, text: content}])});
-    }
-
-    @selfbind
-    reset() {
-        this.setState({data: []});
-    }
-
     render() {
         let crstyle = {color: "#ddd", textDecoration: "none", marginTop: "10px", position: "relative"};
+        const { comms: comments, commsMap: commentsMap, dispatch } = this.props;
+        let boundActions = bindActionCreators(actions, dispatch)
+
         return (
             <div className="commentSection">
                 <AppBar
                     title="Comments Section"
                     iconElementLeft={<IconButton onClick={this.loadData}><FontIcon className="mdi mdi-refresh" color={Colors.white500} /></IconButton>}
-                    iconElementRight={<IconButton onClick={this.reset}><FontIcon className="mdi mdi-close" color={Colors.white500} /></IconButton>}
+                    iconElementRight={<IconButton onClick={boundActions.resetComments}><FontIcon className="mdi mdi-close" color={Colors.white500} /></IconButton>}
                 />
-                <List data={this.state.data} />
-                <Form submitHandle={this.addComment}/>
+                <List indexes={comments} data={commentsMap} />
+                <Form submitHandle={boundActions.addComment}/>
                 <div className="footer"><span id="links">
                     <a href="https://facebook.com/sabinmarcu">
                         <FontIcon className="mdi mdi-18px mdi-facebook" color={Colors.white500} style={{color: "#ccc", fontSize: "14pt !important", margin: "0 2px 0 0"}} />

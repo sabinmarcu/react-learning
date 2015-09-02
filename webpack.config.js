@@ -3,6 +3,9 @@ var path = require('path');
 var buildPath = path.resolve(__dirname, 'build');
 var nodeModulesPath = path.resolve(__dirname, 'node_modules');
 var TransferWebpackPlugin = require('transfer-webpack-plugin');
+var devFlagPlugin = new webpack.DefinePlugin({
+  __DEV__: JSON.stringify(JSON.parse(process.env.DEBUG || 'false'))
+});
 
 var config = {
     //Entry points to the project
@@ -13,7 +16,7 @@ var config = {
     ],
     //Config options on how to interpret requires imports
     resolve: {
-        extensions: ["", ".js", ".jsx", ".css", ".styl"],
+        extensions: ["", ".js", ".jsx", ".css", ".styl", ".ls", ".lson"],
         //node_modules: ["web_modules", "node_modules"]    (Default Settings)
     },
     //Server Configuration options
@@ -37,7 +40,16 @@ var config = {
         //Moves files
         new TransferWebpackPlugin([
             {from: 'www'},
-    ], path.resolve(__dirname, "src")),
+        ], path.resolve(__dirname, "src")),
+        devFlagPlugin,
+        // {
+        //     "definitions": {
+        //         "process.env": {
+        //             "NODE_ENV": "\"development\"",
+        //             "IS_BROWSER": true,
+        //         },
+        //     },
+        // },
     ],
     module: {
         //Loaders to interpret non-vanilla javascript code as well as most other extensions including images and text.
@@ -58,18 +70,27 @@ var config = {
                 exclude: [nodeModulesPath],
             },
             {
-                    test: /\.css$/,
-                    loader: "style!css",
+                test: /\.css$/,
+                loader: "style!css",
             },
             {
-                    test: /\.(eot|svg|ttf|woff|woff2)(\?.+)?$/,
-                    loader: "url",
+                test: /\.(eot|svg|ttf|woff|woff2)(\?.+)?$/,
+                loader: "url",
             },
             {
-                    test: /\.styl$/,
-                    loader: 'style-loader!css-loader!stylus-loader',
+                test: /\.styl$/,
+                loader: 'style-loader!css-loader!stylus-loader',
+            },
+            {
+                test: /\.ls$/,
+                loader: 'livescript',
+            },
+            {
+                test: /\.lson$/,
+                loader: 'lson-loader',
             },
         ],
+        "noParse": /lie\.js$|\/leveldown\//
     },
     //eslint config options. Part of the eslint-loader package
     eslint: {

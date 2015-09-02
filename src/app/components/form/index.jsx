@@ -10,6 +10,7 @@ import {Card, CardText, CardTitle, TextField, CardActions, FlatButton, Paper, Li
 
 import {Tabs, Tab} from "material-ui";
 let {ReactLink, ReactStateSetters} = React.addons;
+let ReactTransitionGroup = React.addons.TransitionGroup;
 
 class CommentForm extends React.Component {
 
@@ -51,7 +52,9 @@ class CommentForm extends React.Component {
     get preview() {
         return (<CardText style={{padding: "0"}}>
             <List>
-                <Comment ref="commentComponent" className={this.state.comment.length > 0 ? "bordered" : ""}></Comment>
+                <ReactTransitionGroup>
+                    { this.state.comment.length > 0 && this.state.author.length > 0 && <Comment ref="commentComponent" className={this.state.comment.length > 0 ? "bordered" : ""} /> }
+                </ReactTransitionGroup>
             </List>
         </CardText>);
     }
@@ -143,7 +146,7 @@ class CommentForm extends React.Component {
             reactiveEditor = this.mobileDesign;
         }
         return (
-            <Card initiallyExpanded={false}>
+            <Card initiallyExpanded={true}>
                 <CardTitle title="New Comment" subtitle="Write your code in markdown below" showExpandableButton={true}/>
                 <CardText expandable={true} style={{overflow: "hidden"}}>
                     {reactiveEditor}

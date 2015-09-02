@@ -1,12 +1,22 @@
 import React from "react";
 import Comment from "./comment";
 
-import { Card, List, CardTitle, CardText } from "material-ui"
+import { Card, List, CardTitle, CardText } from "material-ui";
+
+let ReactTransitionGroup = React.addons.TransitionGroup;
 
 export default class CommentList extends React.Component {
 
     render() {
-        let nodes = this.props.data.map((comment,index, array) => <Comment author={comment.name} class={index !== array.length - 1 ? "bordered" : ""}>{comment.text}</Comment>);
+        let nodes = this.props.indexes.map(
+            (comment,index, array) =>
+                <Comment
+                    key={comment}
+                    author={this.props.data[comment].author}
+                    class={index !== array.length - 1 ? "bordered" : ""}>
+                        {this.props.data[comment].comment}
+                </Comment>
+        );
 
         return (
             <Card initiallyExpanded={true}>
@@ -17,7 +27,9 @@ export default class CommentList extends React.Component {
                 </CardTitle>
                 <CardText expandable={true} style={{padding: "0"}}>
                     <List>
-                        {nodes}
+                        <ReactTransitionGroup>
+                            {nodes}
+                        </ReactTransitionGroup>
                     </List>
                 </CardText>
             </Card>
